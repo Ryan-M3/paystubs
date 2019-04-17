@@ -89,7 +89,7 @@ class SaveFile:
             raise AccountMissingError
         return ref[0][0]
 
-    def summarize_account(self, acct_title):
+    def summarize_account(self, acct_title, line_char="-", sum_line_char="="):
         # The coalesce here prevents sum from return None if there's no items
         # to sum up, when logically it should be zero here.
         self.cursor.execute("""SELECT COALESCE(SUM(amt), 0)
@@ -108,17 +108,17 @@ class SaveFile:
         total_cur = locale.currency(abs(total), grouping=True)
         print()
         print("\t", acct_title.center(23))
-        print("\t", "-" * 23)
+        print("\t", line_char * 23)
         print("\t", dr_cur.rjust(10), "|", cr_cur.ljust(10))
-        print("\t", "-" * 23)
+        print("\t", line_char * 23)
         if total == 0:
             print("\t", "-0-".center(10), " ", "-0-".center(10))
         elif total < 0:
             print("\t", total_cur.rjust(10))
-            print("\t", ("=" * len(total_cur)).rjust(10))
+            print("\t", (sum_line_char * len(total_cur)).rjust(10))
         else:
             print("\t", " " * 10, total_cur.ljust(10))
-            print("\t", " " * 13 + ("=" * len(total_cur)).ljust(10))
+            print("\t", " " * 13 + (sum_line_char * len(total_cur)).ljust(10))
         print()
 
     def list_accounts(self):
@@ -128,6 +128,27 @@ class SaveFile:
                 continue
             print(str(ref).ljust(5), title.ljust(20), AcctType(acctType).name)
         print()
+
+
+    def accounts_by_type(self, acctType):
+        self.cursor.execute('''SELECT *
+                               FROM ChartOfAccounts
+                               WHERE acctType=?''', (acctType,))
+        return self.cursor.fetchall()
+
+    def account_type_balances(self, acct_type):
+        """Return the account balances for every account of a certain type."""
+        self.cursor.execute('''SELECT SUM(amt)
+                               FROM Journal
+                               WHERE ref IN
+                                   (SELECT ref
+                                    FROM ChartOfAccounts
+                                    WHERE acctType=?);
+                            ''', (acct_type,))
+        return self.cursor.fetchone()[0]
+
+    def get_capital(self, acct_type):
+        return self.account_type_balances(0) + self.account_type_balances(1)
 
     def _last_entry_id(self):
         self.cursor.execute('''SELECT entryID

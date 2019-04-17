@@ -15,6 +15,7 @@ def parse_terminal():
     parser.add_argument('-t', '--test', action='store_true')
     parser.add_argument('-s', '--summarize', nargs=1)
     parser.add_argument('-l', '--list', action='store_true')
+    parser.add_argument('--coa', action='store_true', help="Chart of Accounts")
 
     subparsers = parser.add_subparsers()
     wage_parser = subparsers.add_parser("wages")
@@ -96,14 +97,13 @@ def main():
     save = SaveFile("~/.config/paystubs/", "books.db")
     parsed = parse_terminal()
     if parsed.book:
-        if parsed.test:
-            get_booking_from_terminal(save)
-        else:
-            save.add_booking(get_booking_from_terminal(save))
+        save.add_booking(get_booking_from_terminal(save))
     elif parsed.summarize:
-        save.summarize_account(parsed.summarize[0])
-    elif parsed.list:
+        save.summarize_account(parsed.summarize[0], line_char=chr(9188), sum_line_char=chr(9552))
+    elif parsed.list or parsed.coa:
         save.list_accounts()
+    elif parsed.test:
+        print(save.get_capital(0))
     elif parsed.times and parsed.date and parsed.tax:
         wage_calc.dispatch(
             save,
