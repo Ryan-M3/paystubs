@@ -79,6 +79,12 @@ class SaveFile:
         self.cursor.execute("SELECT SUM(amt) FROM Journal;")
         return round(self.cursor.fetchall()[0][0], 3) == 0.00
 
+    def account_balance(self, ref):
+        self.cursor.execute('''SELECT COALESCE(SUM(amt), 0)
+                               FROM Journal
+                               WHERE ref=?;''', (ref,))
+        return self.cursor.fetchone()[0]
+
     def get_ref(self, acct_title):
         self.cursor.execute('''SELECT ref
                                FROM ChartOfAccounts
@@ -88,6 +94,12 @@ class SaveFile:
         if not ref:
             raise AccountMissingError
         return ref[0][0]
+
+    def get_acct_title(self, ref):
+        self.cursor.execute('''SELECT account
+                               FROM ChartOfAccounts
+                               WHERE ref=?;''', (ref,))
+        return self.cursor.fetchone()[0]
 
     def summarize_account(self, acct_title, line_char="-", sum_line_char="="):
         # The coalesce here prevents sum from return None if there's no items
@@ -129,12 +141,11 @@ class SaveFile:
             print(str(ref).ljust(5), title.ljust(20), AcctType(acctType).name)
         print()
 
-
     def accounts_by_type(self, acctType):
-        self.cursor.execute('''SELECT *
+        self.cursor.execute('''SELECT ref
                                FROM ChartOfAccounts
                                WHERE acctType=?''', (acctType,))
-        return self.cursor.fetchall()
+        return [row[0] for row in self.cursor.fetchall()]
 
     def account_type_balances(self, acct_type):
         """Return the account balances for every account of a certain type."""

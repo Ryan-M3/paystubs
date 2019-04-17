@@ -4,9 +4,11 @@ import argparse
 from datetime import datetime
 
 import wage_calc
-from booking    import Booking
-from save_file  import SaveFile
-from exceptions import AccountMissingError
+from booking          import Booking
+from save_file        import SaveFile
+from exceptions       import AccountMissingError
+from balance_sheet    import BalanceSheet
+from income_statement import IncomeStatement
 
 
 def parse_terminal():
@@ -15,6 +17,8 @@ def parse_terminal():
     parser.add_argument('-t', '--test', action='store_true')
     parser.add_argument('-s', '--summarize', nargs=1)
     parser.add_argument('-l', '--list', action='store_true')
+    parser.add_argument('-I', '--income-statement', action='store_true')
+    parser.add_argument('-B', '--balance-sheet', action='store_true')
     parser.add_argument('--coa', action='store_true', help="Chart of Accounts")
 
     subparsers = parser.add_subparsers()
@@ -103,7 +107,13 @@ def main():
     elif parsed.list or parsed.coa:
         save.list_accounts()
     elif parsed.test:
-        print(save.get_capital(0))
+        pass
+    elif parsed.income_statement:
+        income_stmt = IncomeStatement(save)
+        income_stmt.print()
+    elif parsed.balance_sheet:
+        bs = BalanceSheet(save)
+        bs.print()
     elif parsed.times and parsed.date and parsed.tax:
         wage_calc.dispatch(
             save,
