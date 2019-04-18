@@ -37,17 +37,6 @@ def calc_wages(dur, rate):
     return float(dur.total_seconds()) / 60**2 * rate
 
 
-def parse_args():
-    _ = sys.argv.pop(0)
-    hourly_rate = None
-    tax_rate = None
-    if "%" in sys.argv[-1]:
-        tax_rate = float(sys.argv.pop().replace("%", ""))
-    if "@" in sys.argv[-1]:
-        hourly_rate = float(sys.argv.pop().replace("@", ""))
-    return hourly_rate, tax_rate, times
-
-
 def print_results(total_hrs, wages, taxes):
     print("Wage calculation:")
     # We don't care about seconds, so we ignore the last three characters in
@@ -62,7 +51,6 @@ def dispatch(save, date, hourly_rate, tax_rate, time_args):
     Tie together all the functions of this program into one convenient function.
     """
     times = list(map(parse_time, time_args))
-    #hourly_rate, tax_rate, time_args = parse_args()
     total_hrs = calculate_time(times)
     wages = calc_wages(total_hrs, hourly_rate)
     taxes = wages * tax_rate
