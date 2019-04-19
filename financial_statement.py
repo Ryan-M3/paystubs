@@ -9,11 +9,20 @@ from collections import defaultdict
 TAB = " " * 4
 
 class FinancialStatement:
-    def __init__(self, save, title_width=35, bal_width=9):
+    def __init__(self, save, stmt_title="Report", title_width=35, bal_width=9):
         self.save = save
         self.totals = defaultdict(int)
         self.title_width = title_width
         self.bal_width = bal_width
+        self.stmt_title = stmt_title.upper()
+
+    def print_header(self):
+        stmt_width = self.title_width + self.bal_width
+        header = "{0}".format(self.stmt_title).center(stmt_width)
+        print()
+        print(header)
+        print("YTD".center(stmt_width))
+        print("\n")
 
     def print_section(self, section_title, acct_type):
         print(section_title.upper())

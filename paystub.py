@@ -19,6 +19,7 @@ def parse_terminal():
     parser.add_argument('-l', '--list', action='store_true')
     parser.add_argument('-I', '--income-statement', action='store_true')
     parser.add_argument('-B', '--balance-sheet', action='store_true')
+    parser.add_argument('-#', '--ref', nargs=1)
     parser.add_argument('--coa', action='store_true', help="Chart of Accounts")
 
     subparsers = parser.add_subparsers()
@@ -103,16 +104,16 @@ def main():
     if parsed.book:
         save.add_booking(get_booking_from_terminal(save))
     elif parsed.summarize:
-        save.summarize_account(parsed.summarize[0], line_char=chr(9188), sum_line_char=chr(9552))
+        save.summarize_account(parsed.summarize[0])
     elif parsed.list or parsed.coa:
         save.list_accounts()
     elif parsed.test:
-        pass
+        print(save.entries_by_date(parsed.ref[0]))
     elif parsed.income_statement:
-        income_stmt = IncomeStatement(save)
+        income_stmt = IncomeStatement(save, "Income Statement", title_width=25)
         income_stmt.print()
     elif parsed.balance_sheet:
-        bs = BalanceSheet(save)
+        bs = BalanceSheet(save, "Balance Sheet", title_width=25)
         bs.print()
     elif parsed.times and parsed.date and parsed.tax:
         wage_calc.dispatch(

@@ -161,6 +161,15 @@ class SaveFile:
     def get_capital(self, acct_type):
         return self.account_type_balances(0) + self.account_type_balances(1)
 
+    def entries_by_date(self, ref, oldest="1970-01-01", newest="now"):
+        self.cursor.execute('''SELECT date, amt
+                               FROM Journal
+                               WHERE date(date)
+                               BETWEEN date(?) AND date(?)
+                               AND ref=?;
+                            ''', (oldest, newest, ref))
+        return self.cursor.fetchall()
+
     def _last_entry_id(self):
         self.cursor.execute('''SELECT entryID
                                FROM Journal

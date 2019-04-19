@@ -9,6 +9,7 @@ from collections import defaultdict
 
 class BalanceSheet(FinancialStatement):
     def print(self):
+        self.print_header()
         self.print_section("assets", 0)
         self.print_section("liabilities", 1)
         self.print_section("equity", 2)
