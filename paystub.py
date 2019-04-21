@@ -9,10 +9,12 @@ from save_file        import SaveFile
 from exceptions       import AccountMissingError
 from balance_sheet    import BalanceSheet
 from income_statement import IncomeStatement
+from acct_types       import AcctType
 
 
 def parse_terminal():
     parser = argparse.ArgumentParser()
+    parser.set_defaults(which='main')
     parser.add_argument('-b', '--book', action='store_true')
     parser.add_argument('-t', '--test', action='store_true')
     parser.add_argument('-s', '--summarize', nargs=1)
@@ -20,10 +22,31 @@ def parse_terminal():
     parser.add_argument('-I', '--income-statement', action='store_true')
     parser.add_argument('-B', '--balance-sheet', action='store_true')
     parser.add_argument('-#', '--ref', nargs=1)
-    parser.add_argument('--coa', action='store_true', help="Chart of Accounts")
+    parser.add_argument(
+        '--account-type',
+        nargs=1,
+        type=int,
+        help="Specifies the account type. Key:"
+             "\n\t0 - Asset"
+             "\n\t1 - Liability"
+             "\n\t2 - Capital"
+             "\n\t3 - Revenue"
+             "\n\t4 - Expense"
+             "\n\t5 - Gain"
+             "\n\t6 - Loss"
+             "\n\t7 - Contra"
+             "\n\t8 - Adjunct"
+    )
+    parser.add_argument(
+        '--add-account',
+        nargs=1,
+        help="Add a new account. Requires the --ref argument "
+             "and the --account-type argument."
+    )
 
     subparsers = parser.add_subparsers()
     wage_parser = subparsers.add_parser("wages")
+    wage_parser.set_defaults(which='wages')
     wage_parser.add_argument(
         '-d', '--date',
         nargs=1,
@@ -105,7 +128,7 @@ def main():
         save.add_booking(get_booking_from_terminal(save))
     elif parsed.summarize:
         save.summarize_account(parsed.summarize[0])
-    elif parsed.list or parsed.coa:
+    elif parsed.list:
         save.list_accounts()
     elif parsed.test:
         print(save.entries_by_date(parsed.ref[0]))
@@ -115,7 +138,7 @@ def main():
     elif parsed.balance_sheet:
         bs = BalanceSheet(save, "Balance Sheet", title_width=25)
         bs.print()
-    elif parsed.times and parsed.date and parsed.tax:
+    elif parsed.which == "wages":
         wage_calc.dispatch(
             save,
             parsed.date[0],
@@ -123,6 +146,11 @@ def main():
             float(parsed.tax[0]),
             parsed.times
         )
+    elif parsed.add_account:
+        ref = parsed.ref[0]
+        acct = parsed.add_account[0]
+        category = parsed.account_type[0]
+        save.add_account(ref, acct, AcctType(category))
     else:
         print("Invalid command line arguments.")
 
