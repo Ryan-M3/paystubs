@@ -4,6 +4,7 @@ import argparse
 from datetime import datetime
 
 import wage_calc
+import date_plot
 from booking          import Booking
 from save_file        import SaveFile
 from exceptions       import AccountMissingError
@@ -69,6 +70,23 @@ def parse_terminal():
         help="List of start and stop times, one after the other in "
              "chronological order, that you were at work."
     )
+
+    plot_parser = subparsers.add_parser('plot')
+    plot_parser.set_defaults(which='plot')
+    plot_parser.add_argument('-H', '--histogram', action='store_true')
+    plot_parser.add_argument(
+        '-s', '--start-date',
+        nargs=1,
+        help = "The oldest entry to plot in the format of YYYY-MM-DD. "
+               "'unixepoch' is also an acceptable date."
+    )
+    plot_parser.add_argument(
+        '-e', '--end-date',
+        nargs=1,
+        help = "The newest entry to plot. Must be in the format of YYYY-MM-DD. "
+               "'now' is also an acceptable date."
+    )
+    plot_parser.add_argument('-#', '--ref', nargs=1)
     return parser.parse_args()
 
 
@@ -151,6 +169,11 @@ def main():
         acct = parsed.add_account[0]
         category = parsed.account_type[0]
         save.add_account(ref, acct, AcctType(category))
+    elif parsed.which == "plot":
+        ref = parsed.ref[0]
+        oldest = parsed.start_date[0]
+        newest = parsed.end_date[0]
+        date_plot.dispatch(save, ref, oldest, newest, parsed.histogram)
     else:
         print("Invalid command line arguments.")
 

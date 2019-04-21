@@ -13,4 +13,4 @@ class BalanceSheet(FinancialStatement):
         self.print_section("assets", 0)
         self.print_section("liabilities", 1)
         self.print_section("equity", 2)
-        self.print_grand_total("Total Liabilities and Equity")
+        self.print_grand_total("Total Equity")
