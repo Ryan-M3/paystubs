@@ -170,10 +170,14 @@ def main():
         category = parsed.account_type[0]
         save.add_account(ref, acct, AcctType(category))
     elif parsed.which == "plot":
-        ref = parsed.ref[0]
-        oldest = parsed.start_date[0]
-        newest = parsed.end_date[0]
-        date_plot.dispatch(save, ref, oldest, newest, parsed.histogram)
+        date_plot.dispatch(
+            save,
+            parsed.ref[0],
+            save.get_acct_title(parsed.ref[0]),
+            parsed.start_date[0],
+            parsed.end_date[0],
+            parsed.histogram
+        )
     else:
         print("Invalid command line arguments.")
 

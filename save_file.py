@@ -1,11 +1,9 @@
 import sqlite3 as sql
-import locale
 import os
 
 from acct_types import AcctType
 from exceptions import AccountMissingError
-
-locale.setlocale(locale.LC_ALL, '')
+from fmt_money  import fmt_money
 
 
 class SaveFile:
@@ -115,9 +113,9 @@ class SaveFile:
                             """, (self.get_ref(acct_title),))
         cr = self.cursor.fetchone()[0]
         total = dr + cr
-        dr_cur = locale.currency(dr * -1, grouping=True)
-        cr_cur = locale.currency(cr, grouping=True)
-        total_cur = locale.currency(abs(total), grouping=True)
+        dr_cur = fmt_money(dr * -1)
+        cr_cur = fmt_money(cr)
+        total_cur = fmt_money(abs(total))
         print()
         print("\t", acct_title.center(23))
         print("\t", line_char * 23)
