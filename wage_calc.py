@@ -62,6 +62,8 @@ def dispatch(save, date, hourly_rate, tax_rate, time_args):
         (date, save.get_ref("Wages")           ,  wages)
     ]
     h = total_hrs.seconds // 60**2
-    m = total_hrs.seconds % 60
+    # If h isn't subtracted  first, then minutes will ALWAYS
+    # be divisible by 60.
+    m = (total_hrs.seconds - h)% 60
     comment = "Worked {0} hours and {1} minutes.".format(h, m)
     save.add_booking(Booking(entries, comment))

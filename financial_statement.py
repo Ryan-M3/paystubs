@@ -22,7 +22,7 @@ class FinancialStatement:
         print()
         print(header)
         print("YTD".center(stmt_width))
-        print("\n")
+        print()
 
     def print_section(self, section_title, acct_type):
         print(section_title.upper())
