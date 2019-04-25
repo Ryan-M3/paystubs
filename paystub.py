@@ -3,14 +3,14 @@
 import argparse
 from datetime import datetime
 
-import wage_calc
-import date_plot
-from booking          import Booking
-from save_file        import SaveFile
-from exceptions       import AccountMissingError
-from balance_sheet    import BalanceSheet
-from income_statement import IncomeStatement
-from acct_types       import AcctType
+import modules.wage_calc as wage_calc
+import modules.date_plot as date_plot
+from data.booking    import Booking
+from save_file       import SaveFile
+from exceptions      import AccountMissingError
+from financial_stmts import BalanceSheet, IncomeStatement
+from data.acct_types import AcctType
+from data.entry      import Entry
 
 
 def parse_terminal():

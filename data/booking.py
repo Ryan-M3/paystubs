@@ -1,4 +1,6 @@
-from exceptions import *
+from exceptions import UnbalancedEntriesError
+from exceptions import MismatchingDatesError
+from exceptions import MissingCommentError
 
 
 class Booking:

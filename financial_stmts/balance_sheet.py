@@ -1,10 +1,10 @@
-from financial_statement import FinancialStatement, TAB
-from acct_types import AcctType
-from fmt_money import fmt_money
-from colors import Colors
-from colors import wrap_color
-
 from collections import defaultdict
+
+from financial_stmts.abc  import FinancialStatement, TAB
+from data.acct_types      import AcctType
+from formatting.fmt_money import fmt_money
+from formatting.colors    import Colors
+from formatting.colors    import wrap_color
 
 
 class BalanceSheet(FinancialStatement):

@@ -1,9 +1,9 @@
 import sqlite3 as sql
 import os
 
-from acct_types import AcctType
-from exceptions import AccountMissingError
-from fmt_money  import fmt_money
+from data.acct_types       import AcctType
+from exceptions            import AccountMissingError
+from formatting.fmt_money  import fmt_money
 
 
 class SaveFile:
@@ -168,6 +168,20 @@ class SaveFile:
                                ORDER BY date(date) ASC;
                             ''', (oldest, newest, ref))
         return self.cursor.fetchall()
+
+    def get_entries_by_entry_num(self, entry_num):
+        self.cursor.execute('''SELECT date, amt, ref
+                               FROM Journal
+                               WHERE entryID=?;
+                            ''', (entry_num,))
+        return self.cursor.fetchall()
+
+    def get_comment(self, entry_num):
+        self.cursor.execute('''SELECT comment
+                               FROM Comments
+                               WHERE entryID=?;
+                            ''', (entry_num,))
+        return self.cursor.fetchone()[0]
 
     def _last_entry_id(self):
         self.cursor.execute('''SELECT entryID

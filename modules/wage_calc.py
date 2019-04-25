@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
 
 import sys
-import locale
 from datetime import timedelta
 
-from booking import Booking
+from data.booking         import Booking
+from formatting.fmt_money import fmt_money
 
-locale.setlocale(locale.LC_ALL, '')
 
 
 def parse_time(string):
@@ -41,9 +40,9 @@ def print_results(total_hrs, wages, taxes):
     print("Wage calculation:")
     # We don't care about seconds, so we ignore the last three characters in
     # total_hrs.
-    print("\ttotal: ", str(total_hrs)[:-3])
-    print("\twages: ", locale.currency(wages, grouping=True))
-    print("\ttaxes: ", locale.currency(taxes, grouping=True))
+    print("\ttotal:", str(total_hrs)[:-3])
+    print("\twages:", fmt_money(wages))
+    print("\ttaxes:", fmt_money(taxes))
 
 
 def dispatch(save, date, hourly_rate, tax_rate, time_args):
