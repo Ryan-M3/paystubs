@@ -5,12 +5,13 @@ from datetime import datetime
 
 import modules.wage_calc as wage_calc
 import modules.date_plot as date_plot
-from data.booking    import Booking
-from save_file       import SaveFile
-from exceptions      import AccountMissingError
-from financial_stmts import BalanceSheet, IncomeStatement
-from data.acct_types import AcctType
-from data.entry      import Entry
+from modules.show_entries import show_last
+from data.booking         import Booking
+from save_file            import SaveFile
+from exceptions           import AccountMissingError
+from financial_stmts      import BalanceSheet, IncomeStatement
+from data.acct_types      import AcctType
+from data.entry           import Entry
 
 
 def parse_terminal():
@@ -87,6 +88,21 @@ def parse_terminal():
                "'now' is also an acceptable date."
     )
     plot_parser.add_argument('-#', '--ref', nargs=1)
+
+    show_parser = subparsers.add_parser('show')
+    show_parser.set_defaults(which='show')
+    show_parser.add_argument(
+        '--last',
+        nargs=1,
+        type=int,
+        help="display the last n journal entries"
+    )
+    show_parser.add_argument(
+        '--since',
+        nargs=1,
+        type=str,
+        help="show all journal entries since a certain date."
+    )
     return parser.parse_args()
 
 
@@ -178,6 +194,8 @@ def main():
             parsed.end_date[0],
             parsed.histogram
         )
+    elif parsed.which == "show":
+        show_last(save, parsed.last[0])
     else:
         print("Invalid command line arguments.")
 

@@ -1,3 +1,4 @@
+import textwrap
 from data.entry   import Entry
 from data.booking import Booking
 
@@ -8,27 +9,30 @@ class EmptyBooking:
         self.entries = []
         self.comment = ""
 
-    def load(self, entry_num):
-        for date, amt, ref in self.savef.get_entries_by_entry_num(entry_num):
+    def load(self, entry_id):
+        for date, amt, ref in self.savef.get_entries_by_entry_id(entry_id):
             title = self.savef.get_acct_title(ref)
             self.entries.append(Entry(date, title, ref, amt))
-        self.comment = self.savef.get_comment(entry_num)
+        self.comment = self.savef.get_comment(entry_id)
 
     def set(self, entries, comment):
         self.entries += entries
         self.comment = comment
 
-    def save(self, entry_num):
+    def save(self, entry_id):
         self.savef.add_booking(Booking(self.entries, self.comment))
 
     def __str__(self):
         self.entries = sorted(self.entries, key=lambda k: k.amt)
-        s = "\n"
+        s = ""
         s += self.entries[0].fmt(show_date=True) + "\n"
         for entry in self.entries[1:]:
             s += entry.fmt() + "\n"
-        s += "\n"
-        s += "\033[;1;2m" + self.comment.center(80) + "\033[0m"
+        s += "\033[1;2m"
+        for line in textwrap.wrap(self.comment):
+            s += line.center(80)
+        s += "\033[0m"
+        s += "\n\n"
         return s
 
     def __repr__(self):

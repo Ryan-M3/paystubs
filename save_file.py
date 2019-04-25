@@ -169,12 +169,20 @@ class SaveFile:
                             ''', (oldest, newest, ref))
         return self.cursor.fetchall()
 
-    def get_entries_by_entry_num(self, entry_num):
+    def get_entries_by_entry_id(self, entry_num):
         self.cursor.execute('''SELECT date, amt, ref
                                FROM Journal
                                WHERE entryID=?;
                             ''', (entry_num,))
         return self.cursor.fetchall()
+
+    def get_most_recent_entry_ids(self, n):
+        self.cursor.execute('''SELECT DISTINCT(entryID)
+                               FROM Journal
+                               ORDER BY date DESC
+                               LIMIT ?;
+                            ''', (n,))
+        return sorted([row[0] for row in self.cursor.fetchall()])
 
     def get_comment(self, entry_num):
         self.cursor.execute('''SELECT comment

@@ -38,14 +38,12 @@ class Entry:
             show_date    =  False,
             date_fmt     =  "%D",
             date_pad     =     3,
-            title_width  =    37,
+            title_width  =    27,
             indent_width =     4,
             ref_width    =     6,
             ref_pad      =     3,
             num_width    =    10,
             num_col_pad  =     3):
-        # Default  formatting values  chosen so  that output
-        # will be 80 characters long.
 
         s = ""
         date_str = datetime.strftime(self.date, date_fmt)
