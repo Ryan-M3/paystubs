@@ -3,9 +3,9 @@
 import argparse
 from datetime import datetime
 
-import modules.wage_calc as wage_calc
-import modules.date_plot as date_plot
-from modules.show_entries import show_last
+import modules.wage_calc    as wage_calc
+import modules.date_plot    as date_plot
+import modules.show_entries as show
 from data.booking         import Booking
 from save_file            import SaveFile
 from exceptions           import AccountMissingError
@@ -103,6 +103,14 @@ def parse_terminal():
         type=str,
         help="show all journal entries since a certain date."
     )
+    show_parser.add_argument(
+        '--containing',
+        nargs=1,
+        type=int,
+        help = "show all journal entries which contain a "\
+               "transaction in a specified account."
+    )
+
     return parser.parse_args()
 
 
@@ -134,25 +142,25 @@ def parse_entry(date, text, save_file):
 
 
 def get_booking_from_terminal(save):
-        date = input("Enter date (blank for today): ")
-        if not date:
-            now   = datetime.now()
-            year  = now.year
-            month = str(now.month).zfill(2)
-            day   = str(now.day).zfill(2)
-            date  = "{0}-{1}-{2}".format(year, month, day)
+    date = input("Enter date (blank for today): ")
+    if not date:
+        now   = datetime.now()
+        year  = now.year
+        month = str(now.month).zfill(2)
+        day   = str(now.day).zfill(2)
+        date  = "{0}-{1}-{2}".format(year, month, day)
 
-        print("Enter dr./cr. entries one-by-one, followed by a blank line.")
-        entries = []
-        while True:
-            got = input("\t# ")
-            if got == "":
-                break
-            entries.append(parse_entry(date, got, save))
+    print("Enter dr./cr. entries one-by-one, followed by a blank line.")
+    entries = []
+    while True:
+        got = input("\t# ")
+        if got == "":
+            break
+        entries.append(parse_entry(date, got, save))
 
-        comment = input("Enter Comment:\n\t")
+    comment = input("Enter Comment:\n\t")
 
-        return Booking(entries, comment)
+    return Booking(entries, comment)
 
 
 def main():
@@ -195,7 +203,10 @@ def main():
             parsed.histogram
         )
     elif parsed.which == "show":
-        show_last(save, parsed.last[0])
+        if parsed.last:
+            show.show_last(save, parsed.last[0])
+        elif parsed.containing:
+            show.show_containing(save, parsed.containing[0])
     else:
         print("Invalid command line arguments.")
 

@@ -191,6 +191,13 @@ class SaveFile:
                             ''', (entry_num,))
         return self.cursor.fetchone()[0]
 
+    def get_entries_containing(self, ref):
+        self.cursor.execute('''SELECT DISTINCT(entryID)
+                               FROM Journal
+                               WHERE ref=?;
+                            ''', (ref,))
+        return [fetched[0] for fetched in self.cursor.fetchall()]
+
     def _last_entry_id(self):
         self.cursor.execute('''SELECT entryID
                                FROM Journal
