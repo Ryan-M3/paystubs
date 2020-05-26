@@ -11,5 +11,6 @@ setup(
     packages=['paystubs', 'paystubs/modules', 'paystubs/formatting', 'paystubs/financial_stmts', 'paystubs/data'],
     url='',
     ext_modules=[Extension('default_coa', ['default_coa.csv'])],
+    depends=['matplotlib'],
 
 )

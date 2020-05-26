@@ -159,7 +159,7 @@ def get_booking_from_terminal(save):
     for entry in booking.entries:
         if len(entry) == 0:
             break
-        entries.append(parse_entry2(date, entry, save))
+        entries.append(parse_entry(date, entry, save))
 
     return Booking(entries, booking.comment)
 
@@ -169,7 +169,7 @@ def main():
     parsed = parse_terminal()
 
     if parsed.book:
-        save.add_booking(get_booking_from_terminal2(save))
+        save.add_booking(get_booking_from_terminal(save))
         print("Complete.")
 
     elif parsed.summarize:
