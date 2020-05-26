@@ -1,0 +1,28 @@
+0,Memo,0
+100,Cash,0
+200,Checking,0
+300,Saving,0
+400,401(k),0
+500,Wages Recievable,0
+1100,Taxes Payable,1
+2000,Parent's Money,3
+2100,Wages,3
+3000,Federal Tax Expense,4
+3100,State & Local Tax,4
+3200,Service Fee (Banking),4
+3300,Clothing,4
+3400,Electronics,4
+3500,Furniture,4
+3600,Rent,4
+3700,Utilities,4
+3800,Insurance,4
+3900,Tansportation,4
+4000,Pet,4
+4100,Dining Out,4
+4200,Home Cooking,4
+4300,Health Care,4
+4400,Cleaning Supplies,4
+4500,Grooming Supplies,4
+4600,Entertainment,4
+5000,Misc Gain,5
+5500,Misc Loss,6
