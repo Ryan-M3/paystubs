@@ -12,6 +12,7 @@ from exceptions           import AccountMissingError
 from financial_stmts      import BalanceSheet, IncomeStatement
 from data.acct_types      import AcctType
 from data.entry           import Entry
+from cli                  import get_booking
 
 
 def parse_terminal():
@@ -29,21 +30,26 @@ def parse_terminal():
         nargs=1,
         type=int,
         help="Specifies the account type. Key:"
-             "\n\t0 - Asset"
-             "\n\t1 - Liability"
-             "\n\t2 - Capital"
-             "\n\t3 - Revenue"
-             "\n\t4 - Expense"
-             "\n\t5 - Gain"
-             "\n\t6 - Loss"
-             "\n\t7 - Contra"
-             "\n\t8 - Adjunct"
+             "\n0 - Asset"
+             "\n1 - Liability"
+             "\n2 - Capital"
+             "\n3 - Revenue"
+             "\n4 - Expense"
+             "\n5 - Gain"
+             "\n6 - Loss"
+             "\n7 - Contra"
+             "\n8 - Adjunct"
     )
     parser.add_argument(
         '--add-account',
         nargs=1,
         help="Add a new account. Requires the --ref argument "
              "and the --account-type argument."
+    )
+    parser.add_argument(
+        '--coa-from-file',
+        nargs=1,
+        help="Add a new Chart of Accounts from a csv file."
     )
 
     subparsers = parser.add_subparsers()
@@ -114,8 +120,7 @@ def parse_terminal():
     return parser.parse_args()
 
 
-def parse_entry(date, text, save_file):
-    tokens = text.split()
+def parse_entry(date, tokens, save_file):
     if len(tokens) < 3:
         raise RuntimeError("Invalid debit or credit entry.")
 
@@ -149,37 +154,41 @@ def get_booking_from_terminal(save):
         month = str(now.month).zfill(2)
         day   = str(now.day).zfill(2)
         date  = "{0}-{1}-{2}".format(year, month, day)
-
-    print("Enter dr./cr. entries one-by-one, followed by a blank line.")
+    booking = get_booking()
     entries = []
-    while True:
-        got = input("\t# ")
-        if got == "":
+    for entry in booking.entries:
+        if len(entry) == 0:
             break
-        entries.append(parse_entry(date, got, save))
+        entries.append(parse_entry2(date, entry, save))
 
-    comment = input("Enter Comment:\n\t")
-
-    return Booking(entries, comment)
+    return Booking(entries, booking.comment)
 
 
 def main():
     save = SaveFile("~/.config/paystubs/", "books.db")
     parsed = parse_terminal()
+
     if parsed.book:
-        save.add_booking(get_booking_from_terminal(save))
+        save.add_booking(get_booking_from_terminal2(save))
+        print("Complete.")
+
     elif parsed.summarize:
         save.summarize_account(parsed.summarize[0])
+
     elif parsed.list:
         save.list_accounts()
+
     elif parsed.test:
         print(save.entries_by_date(parsed.ref[0]))
+
     elif parsed.income_statement:
         income_stmt = IncomeStatement(save, "Income Statement", title_width=25)
         income_stmt.print()
+
     elif parsed.balance_sheet:
         bs = BalanceSheet(save, "Balance Sheet", title_width=25)
         bs.print()
+
     elif parsed.which == "wages":
         wage_calc.dispatch(
             save,
@@ -188,11 +197,22 @@ def main():
             float(parsed.tax[0]),
             parsed.times
         )
+
     elif parsed.add_account:
         ref = parsed.ref[0]
         acct = parsed.add_account[0]
         category = parsed.account_type[0]
         save.add_account(ref, acct, AcctType(category))
+
+    elif parsed.coa_from_file:
+        with open(parsed.coa_from_file[0]) as f:
+            while True:
+                read = f.readline().strip()
+                if not read:
+                    break
+                [ref, acct, category] = read.split(",")
+                save.add_account(ref, acct, AcctType(int(category)))
+
     elif parsed.which == "plot":
         date_plot.dispatch(
             save,
@@ -202,11 +222,13 @@ def main():
             parsed.end_date[0],
             parsed.histogram
         )
+
     elif parsed.which == "show":
         if parsed.last:
             show.show_last(save, parsed.last[0])
         elif parsed.containing:
             show.show_containing(save, parsed.containing[0])
+
     else:
         print("Invalid command line arguments.")
 
