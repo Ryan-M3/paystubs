@@ -83,6 +83,11 @@ class CursesJournalEntryBox:
         elif key == '.' and not self.has_decimal:
             self.has_decimal = True
             self.amt += key
+        elif key == 'KEY_BACKSPACE':
+            if self.amt and self.amt[-1] == '.':
+                self.has_decimal = False
+            if self.amt:
+                self.amt = self.amt[:-1]
         elif key == '\n':
             if self.is_debit:
                 self.entries.append(("dr.", self.acct, float(self.amt)))
